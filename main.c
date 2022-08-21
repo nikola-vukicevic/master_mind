@@ -154,7 +154,7 @@ void upis_ocene(char* pokusaji, int red, int pokusaj_niz[], int ocena_niz[], int
 	}
 }
 /* -------------------------------------------------------------------------- */
-void obrada_ulaza(char* pokusaji, int* red, int lozinka[], int pokusaj[], int ocena[], int sirina)
+void obrada_ulaza(char* pokusaji, int* red, int* prekid_korisnik, int lozinka[], int pokusaj[], int ocena[], int sirina)
 {
 	int p;
 
@@ -164,6 +164,8 @@ void obrada_ulaza(char* pokusaji, int* red, int lozinka[], int pokusaj[], int oc
 		while((getchar())!='\n');
 		return;
 	}
+
+	*prekid_korisnik = p == 11;
 
 	if(!da_li_je_u_granicama(p))              return;
 	if(!smestanje_pokusaja_u_niz(pokusaj, p)) return;
@@ -249,9 +251,10 @@ int main()
 		return 0;
 	}
 
-	int ulaz   = 0,
-		reseno = 0,
-	    red    = 0;
+	int ulaz            = 0,
+		reseno          = 0,
+		prekid_korisnik = 0,
+	    red             = 0;
 
 	int lozinka[BROJ_MESTA] = { 1 , 1 , 1 , 1 },
 		pokusaj[BROJ_MESTA] = { 1 , 1 , 1 , 1 },
@@ -262,12 +265,12 @@ int main()
 	reset_strukture_pokusaji(pokusaji);
 	generisanje_lozinke(lozinka);
 	
-	while (!reseno && red < BROJ_POKUSAJA) {
+	while (!reseno && !prekid_korisnik && red < BROJ_POKUSAJA) {
 		system("clear");
 		ispis_maske();
 		if(CHEAT) printf("l: %d %d %d %d\n", lozinka[0], lozinka[1], lozinka[2], lozinka[3]);
 		ispis_dosadasnjih_pokusaja(pokusaji, red, DUZINA_REDA_POKUSAJI);
-		obrada_ulaza(pokusaji, &red, lozinka, pokusaj, ocena, DUZINA_REDA_POKUSAJI);	
+		obrada_ulaza(pokusaji, &red, &prekid_korisnik, lozinka, pokusaj, ocena, DUZINA_REDA_POKUSAJI);	
 		pokusaj_izlaza(&reseno, ocena, &red);
 	}
 

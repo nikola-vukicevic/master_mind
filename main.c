@@ -39,13 +39,13 @@ void ispis_strukture_pokusaji(char* p, int sirina)
 	}
 }
 /* -------------------------------------------------------------------------- */
-void generisanje_lozinke(int lozinka[4])
+void generisanje_lozinke(int lozinka[], int duzina)
 {
 	int i;
 
 	if(!DEBUG) srand(time(NULL));
 
-	for(i = 0; i < BROJ_MESTA; ++i) {
+	for(i = 0; i < duzina; ++i) {
 		lozinka[i] = rand() % BROJ_BOJA + 1;
 	}
 }
@@ -164,18 +164,47 @@ void praznjenje_bafera()
 	}
 }
 /* -------------------------------------------------------------------------- */
+void obrada_ulaza_parser(char* s, int* prekid_korisnik, int* ulaz)
+{
+	int i = 0, n = 0;
+	char str_p[5] = { 0, 0, 0, 0, 0 };
+
+	while (*(s + i) && n < 4) {
+		char c = *(s + i);
+		if(c == 'q' || (c >= '1' && c <= '6')) {
+			str_p[n] = *(s + i);
+			n++;
+		}
+		++i;
+	}
+	
+	if(n == 1 && str_p[0] == 'q') {
+		*prekid_korisnik = 1;
+		*ulaz            = 1111;
+		return;
+	}
+
+	if(n != 4) {
+		*ulaz = -1;
+		return;
+	}
+
+	*ulaz = (str_p[0] - 48) * 1000 + (str_p[1] - 48) * 100 + (str_p[2] - 48) * 10 + str_p[3] - 48;
+}
+/* -------------------------------------------------------------------------- */
 void obrada_ulaza(char* pokusaji, int* red, int* prekid_korisnik, int lozinka[], int pokusaj[], int ocena[], int sirina)
 {
-	int p, r;
+	int  p, r;
+	char s[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 	printf("%d: ", *red + 1);
 
-	r = scanf("%d", &p);
+	r = scanf("%8[^\n]s", s);
 	praznjenje_bafera(); // bitno!
 	
 	if(r != 1)                                return;
 
-	*prekid_korisnik = p == 11;
+	obrada_ulaza_parser(s, prekid_korisnik, &p);
 
 	if(*prekid_korisnik)                      return;
 	if(!da_li_je_u_granicama(p))              return;
@@ -245,8 +274,8 @@ int _debug()
 	for(i = 1; i <= 1000; i++) {
 		reset_strukture_pokusaji(pokusaji);
 		/** ispis_strukture_pokusaji(pokusaji); */
-		generisanje_lozinke(lozinka);
-		generisanje_lozinke(pokusaj);
+		generisanje_lozinke(lozinka, BROJ_MESTA);
+		generisanje_lozinke(pokusaj, BROJ_MESTA);
 		ocenjivanje(lozinka, pokusaj, ocena, BROJ_MESTA);
 		ispis_debug(lozinka, pokusaj, ocena, BROJ_MESTA);
 	}
@@ -273,7 +302,7 @@ int main()
 	char* pokusaji = malloc(BROJ_POKUSAJA * DUZINA_REDA_POKUSAJI);
 	
 	reset_strukture_pokusaji(pokusaji);
-	generisanje_lozinke(lozinka);
+	generisanje_lozinke(lozinka, BROJ_MESTA);
 	
 	while (!reseno && !prekid_korisnik && red < BROJ_POKUSAJA) {
 		system("clear");

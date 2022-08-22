@@ -1,2 +1,2 @@
 # master_mind
-A simple Master Mind (board game) implementation in C
+A simple (or, maybe Suckless?!) implementation of Master Mind (board game) in C.

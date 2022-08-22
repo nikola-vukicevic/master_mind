@@ -154,24 +154,32 @@ void upis_ocene(char* pokusaji, int red, int pokusaj_niz[], int ocena_niz[], int
 	}
 }
 /* -------------------------------------------------------------------------- */
+void praznjenje_bafera()
+{
+	char c = 'a';
+	while(c != '\n' && c != EOF) {
+		c = getchar();
+	}
+}
+/* -------------------------------------------------------------------------- */
 void obrada_ulaza(char* pokusaji, int* red, int* prekid_korisnik, int lozinka[], int pokusaj[], int ocena[], int sirina)
 {
-	int p;
+	int p, r;
 
 	printf("%d: ", *red + 1);
 
-	if(scanf("%d", &p) != 1) {
-		while((getchar())!='\n');
-		return;
-	}
+	r = scanf("%d", &p);
+	praznjenje_bafera(); // bitno!
+	
+	if(r != 1)                                return;
 
 	*prekid_korisnik = p == 11;
 
+	if(*prekid_korisnik)                      return;
 	if(!da_li_je_u_granicama(p))              return;
 	if(!smestanje_pokusaja_u_niz(pokusaj, p)) return;
 
 	++(*red);
-	
 	ocenjivanje(lozinka, pokusaj, ocena, BROJ_MESTA);
 	upis_pokusaja(pokusaji, *red, pokusaj, ocena, sirina);
 	upis_ocene(pokusaji, *red, pokusaj, ocena, sirina);

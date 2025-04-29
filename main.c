@@ -4,18 +4,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+// ------------------------------
 #define BROJ_MESTA           4
 #define BROJ_BOJA            6
-#define BROJ_POKUSAJA        8
+#define BROJ_POKUSAJA        6
 #define DUZINA_REDA_POKUSAJI 23
 #define DONJA_GRANICA        1111
 #define GORNJA_GRANICA       6666
 #define ZNAK_CRNO            '*'
 #define ZNAK_BELO            '+'
+#define CHAR_0               48
 #define DEBUG                0
 #define CHEAT                0
 /* -------------------------------------------------------------------------- */
-void reset_strukture_pokusaji(char* p)
+void reset_strukture_pokusaji(char *p)
 {
 	int d = BROJ_POKUSAJA * DUZINA_REDA_POKUSAJI;
 	int i = 0;
@@ -26,7 +28,7 @@ void reset_strukture_pokusaji(char* p)
 	}
 }
 /* -------------------------------------------------------------------------- */
-void ispis_strukture_pokusaji(char* p, int sirina)
+void ispis_strukture_pokusaji(char *p, int sirina)
 {
 	int i, j;
 
@@ -57,7 +59,7 @@ void ispis_maske()
 	printf("= ------------------ =\n");
 }
 /* -------------------------------------------------------------------------- */
-void ispis_pojedinacnog_reda(char* p, int red, int sirina)
+void ispis_pojedinacnog_reda(char *p, int red, int sirina)
 {
 	int i = 0;
 	
@@ -69,7 +71,7 @@ void ispis_pojedinacnog_reda(char* p, int red, int sirina)
 	printf("\n");
 }
 /* -------------------------------------------------------------------------- */
-void ispis_dosadasnjih_pokusaja(char* p, int red, int sirina)
+void ispis_dosadasnjih_pokusaja(char *p, int red, int sirina)
 {
 	int i = 0;
 
@@ -101,12 +103,13 @@ int smestanje_pokusaja_u_niz(int pokusaj_niz[], int pokusaj_int)
 /* -------------------------------------------------------------------------- */
 void ocenjivanje(int lozinka[], int pokusaj[], int ocena[], int d_n)
 {
-	int i, prebrojavanje[7] = { 0, 0, 0, 0, 0, 0, 0 };
+	int i;
+	int prebrojavanje[7] = { 0, 0, 0, 0, 0, 0, 0 };
 
 	ocena[0] = 0;
 	ocena[1] = 0;
 
-	for(i = 0; i < d_n; i++){
+	for (i = 0; i < d_n; ++i) {
 		if (pokusaj[i] == lozinka[i]) {
 			++ocena[0];
 		}
@@ -115,28 +118,28 @@ void ocenjivanje(int lozinka[], int pokusaj[], int ocena[], int d_n)
 		}
 	}
 
-	for(i = 0; i < d_n; ++i) {
-		if(pokusaj[i] == lozinka[i])      continue;
-		if(prebrojavanje[pokusaj[i]] < 1) continue;
+	for (i = 0; i < d_n; ++i) {
+		if (pokusaj[i] == lozinka[i])      continue;
+		if (prebrojavanje[pokusaj[i]] < 1) continue;
 		++ocena[1];
 		--prebrojavanje[pokusaj[i]];
 	}
 }
 /* -------------------------------------------------------------------------- */
-void upis_pokusaja(char* pokusaji, int red, int pokusaj_niz[], int ocena_niz[], int sirina)
+void upis_pokusaja(char *pokusaji, int red, int pokusaj_niz[], int ocena_niz[], int sirina)
 {
 	--red;
 	*(pokusaji + red * sirina + 0)  = red + 1 + '0';
 	*(pokusaji + red * sirina + 1)  = ':';
-	*(pokusaji + red * sirina + 3)  = pokusaj_niz[0] + 48;
-	*(pokusaji + red * sirina + 5)  = pokusaj_niz[1] + 48;
-	*(pokusaji + red * sirina + 7)  = pokusaj_niz[2] + 48;
-	*(pokusaji + red * sirina + 9)  = pokusaj_niz[3] + 48;
+	*(pokusaji + red * sirina + 3)  = pokusaj_niz[0] + CHAR_0;
+	*(pokusaji + red * sirina + 5)  = pokusaj_niz[1] + CHAR_0;
+	*(pokusaji + red * sirina + 7)  = pokusaj_niz[2] + CHAR_0;
+	*(pokusaji + red * sirina + 9)  = pokusaj_niz[3] + CHAR_0;
 	*(pokusaji + red * sirina + 11) = '[';
 	*(pokusaji + red * sirina + 21) = ']';
 }
 /* -------------------------------------------------------------------------- */
-void upis_ocene(char* pokusaji, int red, int pokusaj_niz[], int ocena_niz[], int sirina)
+void upis_ocene(char *pokusaji, int red, int pokusaj_niz[], int ocena_niz[], int sirina)
 {
 	--red;
 	int i    = 13,
@@ -164,7 +167,7 @@ void praznjenje_bafera()
 	}
 }
 /* -------------------------------------------------------------------------- */
-void obrada_ulaza_parser(char* s, int* prekid_korisnik, int* ulaz)
+void obrada_ulaza_parser(char *s, int *prekid_korisnik, int *ulaz)
 {
 	int i = 0, n = 0;
 	char str_p[5] = { 0, 0, 0, 0, 0 };
@@ -180,7 +183,7 @@ void obrada_ulaza_parser(char* s, int* prekid_korisnik, int* ulaz)
 	
 	if(n == 1 && str_p[0] == 'q') {
 		*prekid_korisnik = 1;
-		*ulaz            = 1111;
+		*ulaz            = DONJA_GRANICA;
 		return;
 	}
 
@@ -189,10 +192,10 @@ void obrada_ulaza_parser(char* s, int* prekid_korisnik, int* ulaz)
 		return;
 	}
 
-	*ulaz = (str_p[0] - 48) * 1000 + (str_p[1] - 48) * 100 + (str_p[2] - 48) * 10 + str_p[3] - 48;
+	*ulaz = (str_p[0] - CHAR_0) * 1000 + (str_p[1] - CHAR_0) * 100 + (str_p[2] - CHAR_0) * 10 + str_p[3] - CHAR_0;
 }
 /* -------------------------------------------------------------------------- */
-void obrada_ulaza(char* pokusaji, int* red, int* prekid_korisnik, int lozinka[], int pokusaj[], int ocena[], int sirina)
+void obrada_ulaza(char *pokusaji, int *red, int *prekid_korisnik, int lozinka[], int pokusaj[], int ocena[], int sirina)
 {
 	int  p, r;
 	char s[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -216,12 +219,12 @@ void obrada_ulaza(char* pokusaji, int* red, int* prekid_korisnik, int lozinka[],
 	upis_ocene(pokusaji, *red, pokusaj, ocena, sirina);
 }
 /* -------------------------------------------------------------------------- */
-void pokusaj_izlaza(int* reseno, int ocena[], int* red)
+void pokusaj_izlaza(int *reseno, int ocena[], int *red)
 {
 	*reseno = ocena[0] == BROJ_MESTA; 
 }
 /* -------------------------------------------------------------------------- */
-void rutina_poslednji_red(char* pokusaji, int lozinka[], int reseno, int red, int sirina)
+void rutina_poslednji_red(char *pokusaji, int lozinka[], int reseno, int red, int sirina)
 {
 	system("clear");
 	ispis_maske();
@@ -269,7 +272,7 @@ int _debug()
 		pokusaj[BROJ_MESTA] = { 1 , 1 , 1 , 1 },
 		ocena[BROJ_MESTA]   = { 0 , 0 };
 	
-	char* pokusaji = malloc(BROJ_POKUSAJA * DUZINA_REDA_POKUSAJI);
+	char *pokusaji = malloc(BROJ_POKUSAJA * DUZINA_REDA_POKUSAJI);
 	
 	for(i = 1; i <= 1000; i++) {
 		reset_strukture_pokusaji(pokusaji);
@@ -299,7 +302,7 @@ int main()
 		pokusaj[BROJ_MESTA] = { 1 , 1 , 1 , 1 },
 		ocena[BROJ_MESTA]   = { 2 , 1 };
 
-	char* pokusaji = malloc(BROJ_POKUSAJA * DUZINA_REDA_POKUSAJI);
+	char *pokusaji = malloc(BROJ_POKUSAJA * DUZINA_REDA_POKUSAJI);
 	
 	reset_strukture_pokusaji(pokusaji);
 	generisanje_lozinke(lozinka, BROJ_MESTA);
@@ -314,8 +317,8 @@ int main()
 	}
 
 	rutina_poslednji_red(pokusaji, lozinka, reseno, red, DUZINA_REDA_POKUSAJI);
+	free(pokusaji);
 
 	return 0;
 }
 /* -------------------------------------------------------------------------- */
-

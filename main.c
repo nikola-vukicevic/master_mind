@@ -23,24 +23,24 @@
 // #define DONJA_GRANICA        1111 // premešteno u init funkciju
 // #define GORNJA_GRANICA       6666 // premešteno u init funkciju
 /* -------------------------------------------------------------------------- */
-void reset_strukture_pokusaji(char *p, int broj_pokusaja, int sirina_reda_pokusaji)
+void reset_strukture_pokusaji(char *pokusaji, int broj_pokusaja, int sirina_reda_pokusaji)
 {
 	int d = broj_pokusaja * sirina_reda_pokusaji;
 	int i = 0;
 
 	while (i <= d) {
-		*(p + i) = ' ';
+		*(pokusaji + i) = ' ';
 		++i;
 	}
 }
 /* -------------------------------------------------------------------------- */
-void ispis_strukture_pokusaji(char *p, int sirina, int broj_pokusaja)
+void ispis_strukture_pokusaji(char *pokusaji, int sirina, int broj_pokusaja)
 {
 	int i, j;
 
 	for (i = 0; i < broj_pokusaja; ++i) {
 		for (j = 0; j < sirina; ++j) {
-			printf("%c ", *(p + i * sirina + j));
+			printf("%c ", *(pokusaji + i * sirina + j));
 		}
 
 		printf("\n");
@@ -49,7 +49,9 @@ void ispis_strukture_pokusaji(char *p, int sirina, int broj_pokusaja)
 /* -------------------------------------------------------------------------- */
 void generisanje_lozinke(int lozinka[], int duzina)
 {
-	if (!DEBUG) srand(time(NULL));
+	if (!DEBUG) {
+		srand(time(NULL));
+	}
 
 	for (int i = 0; i < duzina; ++i) {
 		lozinka[i] = rand() % BROJ_BOJA + 1;
@@ -75,8 +77,8 @@ void ispis_maske(int br_mesta)
 			printf("= -------------------------- =\n");
 		break;
 		default: break;
-}
 	}
+}
 /* -------------------------------------------------------------------------- */
 void ispis_pojedinacnog_reda(char *str_red, int red, int sirina)
 {
@@ -116,8 +118,9 @@ int smestanje_pokusaja_u_niz(int pokusaj_niz[], int pokusaj_int, int broj_mesta)
 		pokusaj_niz[i] = pokusaj_int % 10;
 
 		if (pokusaj_niz[i] < (ZNAK_MIN_CIFRA - CHAR_0) ||
-		    pokusaj_niz[i] > (ZNAK_MAX_CIFRA - CHAR_0))
+		    pokusaj_niz[i] > (ZNAK_MAX_CIFRA - CHAR_0)) {
 			return 0;
+		}
 
 		pokusaj_int /= 10;
 		--i;
@@ -142,11 +145,13 @@ void ocenjivanje(int lozinka[], int pokusaj[], int ocena[], int d_n)
 	}
 
 	for (int i = 0; i < d_n; ++i) {
-		if (pokusaj[i] == lozinka[i])
+		if (pokusaj[i] == lozinka[i]) {
 			continue;
+		}
 
-		if (prebrojavanje[pokusaj[i]] < 1)
+		if (prebrojavanje[pokusaj[i]] < 1) {
 			continue;
+		}
 		
 		++ocena[1];
 		--prebrojavanje[pokusaj[i]];
@@ -174,8 +179,8 @@ void upis_ocene(char *pokusaji, int red, int pokusaj_niz[], int ocena_niz[], int
 {
 	--red;
 
-	int i    = broj_mesta * 2 + 3, // 3 = sirina niske "#: " (na početku reda, npr. "1: ")
-		crni = ocena_niz[0],
+	int i    = broj_mesta * 2 + 3, // 3 = sirina niske "#: " na početku reda
+		crni = ocena_niz[0],       // (npr. "1: ")
 		beli = ocena_niz[1];
 
 	*(pokusaji + red * sirina + i)     = '[';
@@ -295,6 +300,7 @@ void obrada_ulaza(char *pokusaji, int *red, int *prekid_korisnik, int lozinka[],
 		return;
 
 	++(*red);
+
 	ocenjivanje(lozinka, pokusaj, ocena, BROJ_MESTA);
 	upis_pokusaja(pokusaji, *red, pokusaj, ocena, sirina, broj_mesta);
 	upis_ocene(pokusaji, *red, pokusaj, ocena, sirina, broj_mesta);
@@ -402,11 +408,11 @@ int _debug()
 	return 0;
 }
 /* -------------------------------------------------------------------------- */
-void __init(char *pokusaji, int *lozinka, int *donja_granica, int *gornja_granica, int broj_pokusaja, int sirina_reda_pokusaji)
+void __init(char *pokusaji, int *lozinka, int *donja_granica, int *gornja_granica, int broj_pokusaja, int sirina_reda_pokusaji, int broj_mesta)
 {
 	generisanje_donje_i_gornje_granice(donja_granica, gornja_granica);
 	reset_strukture_pokusaji(pokusaji, broj_pokusaja, sirina_reda_pokusaji);
-	generisanje_lozinke(lozinka, BROJ_MESTA);
+	generisanje_lozinke(lozinka, broj_mesta);
 }
 /* -------------------------------------------------------------------------- */
 int main()
@@ -427,12 +433,12 @@ int main()
 
 	char *pokusaji = (char *) malloc(BROJ_POKUSAJA * SIRINA_REDA_POKUSAJI + 1);
 
-	__init(pokusaji, lozinka, &donja_granica, &gornja_granica, BROJ_POKUSAJA, SIRINA_REDA_POKUSAJI);
+	__init(pokusaji, lozinka, &donja_granica, &gornja_granica, BROJ_POKUSAJA, SIRINA_REDA_POKUSAJI, BROJ_MESTA);
+
 	while (!reseno && !prekid_korisnik && red < BROJ_POKUSAJA) {
 		system("clear");
 		ispis_maske(BROJ_MESTA);
 
-	// >>>
 		if (CHEAT)
 			printf("l: %d %d %d %d\n", lozinka[0], lozinka[1], lozinka[2], lozinka[3]);
 		
